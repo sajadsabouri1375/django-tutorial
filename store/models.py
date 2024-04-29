@@ -1,15 +1,17 @@
 from django.db import models
 
 
-class Collection(models.Model):
-    title = models.CharField(max_length=255)
-
-
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
     # product_set -> generated automatically by django
 
+
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
+    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
+    
+    
 class Product(models.Model):
     
     # sku = models.CharField(max_length=10, primary_key=True)
@@ -18,22 +20,22 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion, )
+    collections = models.ForeignKey(Collection, on_delete=models.PROTECT)
+    promotions = models.ManyToManyField(Promotion)
     # If you don't like the auto-generated name of 'product_set' in Promotion class, you could,
     # promotions = models.ManyToManyField(Promotion, related_name='products')
     
     
 class Customer(models.Model):
     
-    MEMBERSHIP_BRONZE = 'B',
-    MEMBERSHIP_SILVER = 'S',
+    MEMBERSHIP_BRONZE = 'B'
+    MEMBERSHIP_SILVER = 'S'
     MEMBERSHIP_GOLD = 'G'
     
     MEMBERSHIP_CHOICES = [
         (MEMBERSHIP_BRONZE, 'Bronze'),
         (MEMBERSHIP_SILVER, 'Silver'),
-        (MEMBERSHIP_GOLD, 'Gold'),
+        (MEMBERSHIP_GOLD, 'Gold')
     ]
     
     fist_name = models.CharField(max_length=255)
