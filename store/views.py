@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q, F
+from django.db.models.aggregates import Count, Max, Min, Avg
+from django.db.models import Value
 from .models import Customer
 
 
@@ -25,4 +27,19 @@ def work_with_data(request):
     for customer in customers:
         print(customer.first_name)
         
-    return render(request, 'hello.html')
+    customers = Customer.objects.filter(first_name__startswith=F('last_name'))
+    for customer in customers:
+        print(f'{customer.first_name}-{customer.last_name}')
+    
+    customers = Customer.objects.order_by('first_name', '-last_name')
+    for customer in customers:
+        print(f'{customer.first_name}-{customer.last_name}')
+    
+    result = Customer.objects.aggregate(count=Count('id'), min_id=Min('id'))
+    print(result)
+    
+    customers = Customer.objects.annotate(is_new=Value(True))
+    for customer in customers:
+        print(customer.is_new)
+        
+    return render(request, 'hello.html', {'customers': list(customers)})

@@ -1,5 +1,12 @@
 <html>
     <body>
         Hello World.
+
+        <ul>
+            {% for customer in customers %}
+            <li>{{ customer.first_name }}</li>
+            {% endfor %}
+        </ul>
+
     </body>
 </html>
