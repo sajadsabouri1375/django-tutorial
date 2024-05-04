@@ -1,11 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F
 from django.db.models.aggregates import Count, Max, Min, Avg
 from django.db.models import Value
+from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import CustomerSerializer
 from .models import Customer
 
 
+@api_view()
+def customers_list(request):
+    queryset = Customer.objects.all()
+    serializer = CustomerSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+@api_view()
+def customer_details(request, id):
+    
+    # try:
+    #     customer = Customer.objects.get(pk=id)
+    #     serializer = CustomerSerializer(customer)
+    #     return Response(serializer.data)
+    # except Customer.DoesNotExist:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    # Instead, we could:
+    customer = get_object_or_404(Customer, pk=id)
+    serializer = CustomerSerializer(customer)
+    return Response(serializer.data)
+
+    
 def work_with_data(request):
     
     # Get a customer
